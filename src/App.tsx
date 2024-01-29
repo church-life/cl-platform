@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { cn } from "@/utils/cn";
+
 export const App = () => {
   const [count, setCount] = useState(0);
 
@@ -10,7 +12,7 @@ export const App = () => {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <p>
+        <p className={cn("bg-red-100", "text-red-600")}>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
