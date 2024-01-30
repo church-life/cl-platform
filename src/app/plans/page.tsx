@@ -1,17 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { getAllPlansQueryOptions } from "@/data-access/plans";
 
-export const Route = createFileRoute("/plans/$planId")({
-  component: PlanComponent,
-});
-
-function PlanComponent() {
-  const { planId } = Route.useParams();
-
+export default function Plans() {
   const serviceTypes: ServiceType[] = [{ id: "1", title: "asd" }];
 
   return (
     <div className='p-2'>
-      <h3>Welcome Plans {planId}</h3>
+      <h3>Plans</h3>
 
       <div>
         {serviceTypes.map((st) => (

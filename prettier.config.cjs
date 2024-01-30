@@ -1,7 +1,7 @@
 // @ts-check
 
-/** @type {import("prettier").Config} */
-module.exports = {
+/** @type {import('prettier').Config & import('prettier-plugin-tailwindcss').PluginOptions & import('@ianvs/prettier-plugin-sort-imports').PrettierConfig} */
+const config = {
   singleQuote: false,
   tabWidth: 2,
   useTabs: false,
@@ -22,3 +22,5 @@ module.exports = {
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   importOrderTypeScriptVersion: "5.0.0",
 };
+
+module.exports = config;
