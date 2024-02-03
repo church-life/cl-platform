@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 
+import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 
 import Providers from "./providers";
@@ -18,9 +19,11 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <body className={`font-sans ${inter.variable}`}>
-        <Providers>{children}</Providers>
-      </body>
+      <ClerkProvider>
+        <body className={`font-sans ${inter.variable}`}>
+          <Providers>{children}</Providers>
+        </body>
+      </ClerkProvider>
     </html>
   );
 }
