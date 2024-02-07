@@ -1,5 +1,7 @@
 import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from "@clerk/nextjs";
 
+import { GroupCreation } from "./group-creation";
+
 export default function HomePage() {
   return (
     <main className='flex min-h-screen flex-col items-center justify-center'>
@@ -7,6 +9,7 @@ export default function HomePage() {
         <h1 className='text-5xl font-extrabold tracking-tight sm:text-[5rem]'>Church Life</h1>
 
         <div className=''>
+          <GroupCreation />
           <SignedIn>
             <UserButton />
             <SignOutButton />
