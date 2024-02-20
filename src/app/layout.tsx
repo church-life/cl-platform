@@ -1,7 +1,10 @@
 import "@/styles/globals.css";
 
+import { esES } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
+
+import { Toaster } from "@/components/ui/sonner";
 
 import Providers from "./providers";
 
@@ -19,9 +22,12 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <ClerkProvider>
+      <ClerkProvider localization={esES}>
         <body className={`font-sans ${inter.variable}`}>
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
         </body>
       </ClerkProvider>
     </html>
