@@ -1,6 +1,6 @@
 "use client";
 
-import { addMonths, differenceInMonths, format, isSameDay } from "date-fns";
+import { addMonths, differenceInMonths, endOfMonth, format, startOfMonth } from "date-fns";
 import { Fragment, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export const GroupCreation = () => {
   const { timeSlots, editTimeSlot, addDayToShow, removeDayToShow, isDayEnabled } = useTimeSlots();
 
   return (
-    <div className='grid grid-cols-2 gap-x-4'>
+    <div className='flex flex-col gap-y-4'>
       <Card className='flex flex-col gap-y-4 p-4'>
         <div className='flex items-center gap-x-2'>
           <p>Start Date</p>
@@ -90,12 +90,12 @@ export const GroupCreation = () => {
         <Calendar
           initialFocus
           mode='multiple'
-          // defaultMonth={date?.from}
-          // selected={date}
+          disableNavigation
           selected={selectedDates}
           onSelect={(days) => setSelectedDates(days || [])}
-          numberOfMonths={2}
-          // numberOfMonths={differenceInMonths(endDate!, startDate!)}
+          numberOfMonths={differenceInMonths(endOfMonth(endDate!), startOfMonth(startDate!)) + 1}
+          fromDate={startDate!}
+          toDate={endDate!}
         />
       </Card>
     </div>
