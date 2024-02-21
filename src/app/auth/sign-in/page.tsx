@@ -4,12 +4,12 @@ import { isClerkAPIResponseError, useSignIn } from "@clerk/nextjs";
 import { type OAuthStrategy } from "@clerk/nextjs/server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiLogoGoogle } from "react-icons/bi";
 import { toast } from "sonner";
-import z from "zod";
+import { z } from "zod";
 
 import { Spinner } from "@/components/spinner";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,9 @@ import { aw } from "@/utils/aw";
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url") || "/";
 
   const { isLoaded, signIn, setActive } = useSignIn();
 
@@ -52,7 +55,7 @@ export default function LoginPage() {
 
     if (completeSignIn.status === "complete") {
       await setActive({ session: completeSignIn.createdSessionId });
-      router.push("/");
+      router.push(redirectUrl);
     }
   };
 
@@ -61,7 +64,7 @@ export default function LoginPage() {
     return signIn.authenticateWithRedirect({
       strategy,
       redirectUrl: "/auth/sso-callback",
-      redirectUrlComplete: "/",
+      redirectUrlComplete: redirectUrl,
     });
   };
 
