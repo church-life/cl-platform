@@ -3,13 +3,14 @@
 import { isClerkAPIResponseError, useSignUp } from "@clerk/nextjs";
 import { type OAuthStrategy } from "@clerk/nextjs/server";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiLogoGoogle } from "react-icons/bi";
 import { toast } from "sonner";
-import z from "zod";
+import { z } from "zod";
 
 import { Spinner } from "@/components/spinner";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,29 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+// import { PhoneInput } from "@/components/ui/phone-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { components } from "@/lib/api";
 import { aw } from "@/utils/aw";
+import { isNestError } from "@/utils/errors";
+
+// import { useSignUp as useSignUp2 } from "./mutations";
+
+type DocumentType = components["schemas"]["DocumentType"];
+const documentTypes = ["DNI", "PASSPORT", "OTHER"] as const satisfies DocumentType[];
+
+const documentTypesWithLabel = [
+  { value: "DNI", label: "DNI" },
+  { value: "PASSPORT", label: "Pasaporte" },
+  { value: "OTHER", label: "Otro" },
+] as const satisfies { value: DocumentType; label: string }[];
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -31,12 +53,31 @@ export default function SignUpPage() {
 
   const { isLoaded, signUp, setActive } = useSignUp();
 
+  // const signUpMutation = useSignUp2({
+  //   onError: (err) => {
+  //     if (isNestError(err)) {
+  //       toast.error(err.message);
+  //     }
+  //     toast.error("Algo salió mal");
+  //     return;
+  //   },
+  //   onSuccess: () => {
+  //     toast.success("Registrado correctamente");
+  //     router.push("/auth/sign-in");
+  //   },
+  // });
+
   const onSubmit = async (data: SignUpForm) => {
     if (!isLoaded) return;
 
     setIsLoading(true);
     const [completeSignIn, err] = await aw(
-      signUp.create({ emailAddress: data.email, password: data.password }),
+      signUp.create({
+        emailAddress: data.email,
+        password: data.password,
+        firstName: data.names,
+        lastName: data.lastNames,
+      }),
     );
     setIsLoading(false);
 
@@ -69,7 +110,7 @@ export default function SignUpPage() {
     <div className='flex w-full flex-col justify-center gap-y-6'>
       <div>
         <h3 className='w-full text-xl font-bold text-primary'>Crea tu cuenta</h3>
-        <p className='text-sm opacity-70'> para continuar a Camino de Vida</p>
+        <p className='text-sm opacity-70'>para continuar a Camino de Vida</p>
       </div>
 
       <Button
@@ -100,7 +141,7 @@ const signUpFormSchema = z
     lastNames: z.string().min(1),
     email: z.string().email({ message: "Correo inválido" }),
     phone: z.string().min(1),
-    documentType: z.string().min(1),
+    documentType: z.enum(documentTypes),
     documentId: z.string().min(1),
     birthDate: z.string().min(1),
     password: z.string().min(1, { message: "La contraseña es requerida" }),
@@ -121,6 +162,8 @@ function SignUpForm({
   onSubmit: (data: SignUpForm) => void;
 }) {
   const form = useForm<SignUpForm>({ resolver: zodResolver(signUpFormSchema) });
+
+  console.log(form.formState.errors);
 
   return (
     <Form {...form}>
@@ -157,19 +200,39 @@ function SignUpForm({
 
         <div className='pt-4' />
 
-        <FormField
-          control={form.control}
-          name='displayName'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre preferido (apodo)</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className='grid w-full grid-cols-2 gap-x-4'>
+          <FormField
+            control={form.control}
+            name='displayName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre preferido (apodo)</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='birthDate'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de nacimiento</FormLabel>
+                <FormControl>
+                  <Input type='date' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* <div className=''>
+          <PhoneInput countries={[]} />
+        </div> */}
 
         <div className='pt-4' />
 
@@ -180,9 +243,20 @@ function SignUpForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tipo de documento</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {documentTypesWithLabel.map((x) => (
+                      <SelectItem key={x.value} value={x.value}>
+                        {x.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
